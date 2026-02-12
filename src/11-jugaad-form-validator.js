@@ -63,4 +63,99 @@
  */
 export function validateForm(formData) {
   // Your code here
+
+  const errors = {};
+
+  if (!formData || typeof formData !== "object") {
+    return { isValid: false, errors: { form: "Invalid form data" } };
+  }
+
+  // 1️⃣ Name
+  const name = typeof formData.name === "string" ? formData.name.trim() : "";
+  if (name.length < 2 || name.length > 50) {
+    errors.name = "Name must be 2-50 characters";
+  }
+
+  // 2️⃣ Email
+  const email = formData.email;
+  if (typeof email !== "string") {
+    errors.email = "Invalid email format";
+  } else {
+    const atIndex = email.indexOf("@");
+    const lastAtIndex = email.lastIndexOf("@");
+
+    const hasOneAt = atIndex !== -1 && atIndex === lastAtIndex;
+    const dotAfterAt = hasOneAt && email.indexOf(".", atIndex) > atIndex + 1;
+
+    if (!hasOneAt || !dotAfterAt) {
+      errors.email = "Invalid email format";
+    }
+  }
+
+  // 3️⃣ Phone
+  const phone = formData.phone;
+  if (
+    typeof phone !== "string" ||
+    phone.length !== 10 ||
+    !["6", "7", "8", "9"].includes(phone[0])
+  ) {
+    errors.phone = "Invalid Indian phone number";
+  } else {
+    for (let ch of phone) {
+      if (ch < "0" || ch > "9") {
+        errors.phone = "Invalid Indian phone number";
+        break;
+      }
+    }
+  }
+
+  // 4️⃣ Age
+  let age = formData.age;
+
+  if (typeof age === "string") {
+    age = parseInt(age, 10);
+  }
+
+  if (
+    typeof age !== "number" ||
+    isNaN(age) ||
+    !Number.isInteger(age) ||
+    age < 16 ||
+    age > 100
+  ) {
+    errors.age = "Age must be an integer between 16 and 100";
+  }
+
+  // 5️⃣ Pincode
+  const pincode = formData.pincode;
+  if (
+    typeof pincode !== "string" ||
+    pincode.length !== 6 ||
+    pincode.startsWith("0")
+  ) {
+    errors.pincode = "Invalid Indian pincode";
+  } else {
+    for (let ch of pincode) {
+      if (ch < "0" || ch > "9") {
+        errors.pincode = "Invalid Indian pincode";
+        break;
+      }
+    }
+  }
+
+  // 6️⃣ State
+  const state = formData?.state ?? "";
+  if (typeof state !== "string" || state.trim().length === 0) {
+    errors.state = "State is required";
+  }
+
+  // 7️⃣ Agree Terms
+  if (!Boolean(formData.agreeTerms)) {
+    errors.agreeTerms = "Must agree to terms";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
 }
